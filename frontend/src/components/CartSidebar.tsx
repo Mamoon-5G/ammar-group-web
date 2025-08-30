@@ -3,16 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'
+interface CartSidebarProps {
+  onRequireLogin: () => void;
+}
 
-const CartSidebar = () => {
-  const { 
-    state, 
-    closeCart, 
-    removeItem, 
-    updateQuantity, 
-    clearCart, 
+const CartSidebar: React.FC<CartSidebarProps> = ({ onRequireLogin }) => {
+
+  const {
+    state,
+    closeCart,
+    removeItem,
+    updateQuantity,
+    clearCart,
     getTotalPrice,
-    getTotalItems 
+    getTotalItems
   } = useCart();
 
   const formatPrice = (price: number) => {
@@ -21,6 +26,14 @@ const CartSidebar = () => {
       currency: 'INR'
     }).format(price);
   };
+  const {isLoggedIn} = useAuth();
+  
+  const handlleCheckout = () => {
+    if (!isLoggedIn) {
+      onRequireLogin();
+      return;
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -169,7 +182,7 @@ const CartSidebar = () => {
                 {/* Checkout Button */}
                 <Link
                   to="/checkout"
-                  onClick={closeCart}
+                  onClick={handlleCheckout}
                   className="w-full btn-primary text-center block"
                 >
                   Proceed to Checkout

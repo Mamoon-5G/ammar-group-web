@@ -14,6 +14,7 @@ interface ProductCardProps {
   rating?: number;
   featured?: boolean;
   inStock?: boolean;
+  hideCart?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -26,13 +27,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   rating = 4.5,
   featured = false,
   inStock = true,
+  hideCart = false,
 }) => {
   const { addItem, openCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
     addItem({
       id,
       name,
@@ -41,7 +42,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
       category,
       brand,
     });
-    
     openCart();
   };
 
@@ -53,136 +53,130 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      whileTap={{ scale: 0.98 }}
-      className="card-product group relative"
-    >
-      {/* Featured Badge */}
-      {featured && (
-        <div className="absolute top-3 left-3 z-10">
-          <div className="bg-accent text-accent-foreground px-2 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
-            <Award className="h-3 w-3" />
-            <span>Featured</span>
+    <Link to={`/catalog/${id}`} className="block">
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative"
+      >
+        {/* Featured Badge - Improved positioning with z-index */}
+        {featured && (
+          <div className="absolute top-3 left-3 z-20">
+            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
+              <Award className="h-3 w-3" />
+              <span className="text-xs font-medium">Featured</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Stock Status */}
-      {!inStock && (
-        <div className="absolute top-3 right-3 z-10">
-          <div className="bg-destructive text-destructive-foreground px-2 py-1 rounded-full text-xs font-semibold">
-            Out of Stock
-          </div>
-        </div>
-      )}
-
-      <Link to={`/catalog/${id}`} className="block">
         {/* Image Container */}
-        <div className="relative overflow-hidden rounded-t-xl bg-muted aspect-square">
+        <div className="relative aspect-square bg-gray-100 overflow-hidden">
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           
-          {/* Overlay Actions */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center space-x-2">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="bg-white/90 hover:bg-white text-foreground p-2 rounded-full shadow-medium"
-              >
-                <Eye className="h-4 w-4" />
-              </motion.button>
-              {inStock && (
+          {/* Gradient Overlay on Hover */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+          
+          {/* Overlay Actions - Only show if cart is not hidden */}
+          {!hideCart && (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center gap-2">
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleAddToCart}
-                  className="bg-primary hover:bg-primary-hover text-primary-foreground p-2 rounded-full shadow-medium"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
                 >
-                  <ShoppingCart className="h-4 w-4" />
+                  <Eye className="h-4 w-4 text-gray-700" />
                 </motion.button>
-              )}
+                {inStock && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleAddToCart}
+                    className="p-2 bg-primary/90 backdrop-blur-sm text-white rounded-full shadow-lg hover:bg-primary transition-colors"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                  </motion.button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Content */}
         <div className="p-4 space-y-3">
           {/* Brand & Category */}
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between">
             {brand && (
-              <span className="text-primary font-medium bg-primary-light px-2 py-1 rounded">
+              <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
                 {brand}
               </span>
             )}
-            {category && (
-              <span className="text-muted-foreground">
+            {category && !brand && (
+              <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
                 {category}
               </span>
             )}
           </div>
 
           {/* Product Name */}
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+          <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
             {name}
           </h3>
 
           {/* Rating */}
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
+          <div className="flex items-center gap-1">
+            <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   className={`h-3 w-3 ${
                     i < Math.floor(rating)
-                      ? 'text-accent fill-current'
-                      : 'text-muted-foreground'
+                      ? 'text-yellow-400 fill-yellow-400'
+                      : 'text-gray-300'
                   }`}
                 />
               ))}
             </div>
-            <span className="text-xs text-muted-foreground">
-              ({rating})
-            </span>
+            <span className="text-xs text-gray-600">({rating})</span>
           </div>
 
           {/* Price & Action */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-lg font-bold text-primary">
+          <div className="flex items-center justify-between pt-2">
+            <div>
+              <p className="text-lg font-bold text-gray-900">
                 {formatPrice(price)}
               </p>
-              <p className="text-xs text-muted-foreground">
-                + GST & Shipping
-              </p>
+              <p className="text-xs text-gray-500">Incl. of taxes</p>
             </div>
-            
-            {inStock ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleAddToCart}
-                className="btn-primary text-sm px-4 py-2"
-              >
-                Add to Cart
-              </motion.button>
-            ) : (
-              <button
-                disabled
-                className="bg-muted text-muted-foreground text-sm px-4 py-2 rounded-lg cursor-not-allowed"
-              >
-                Out of Stock
-              </button>
+
+            {!hideCart && (
+              <div className="flex flex-col items-end gap-1">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!inStock}
+                  className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                    inStock
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {inStock ? 'Add to Cart' : 'Unavailable'}
+                </button>
+                <span className={`text-xs ${
+                  inStock ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {inStock ? "In Stock" : "Out of Stock"}
+                </span>
+              </div>
             )}
           </div>
         </div>
-      </Link>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 };
 

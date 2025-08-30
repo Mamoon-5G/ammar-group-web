@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ShoppingBag, 
-  CreditCard, 
-  Truck, 
+import {
+  ShoppingBag,
+  CreditCard,
+  Truck,
   Shield,
   MapPin,
   Phone,
@@ -36,7 +36,7 @@ const Checkout = () => {
   const { state, updateQuantity, removeItem, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
     lastName: '',
@@ -67,7 +67,7 @@ const Checkout = () => {
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast({
         title: "Missing Information",
@@ -88,18 +88,37 @@ const Checkout = () => {
 
     setIsProcessing(true);
 
-    // Simulate order processing
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:5000/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerInfo,
+          items: state.items,
+          total,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Order failed");
+
       toast({
         title: "Order Placed Successfully!",
         description: "We'll contact you shortly to confirm your order.",
       });
-      
+
       clearCart();
-      navigate('/');
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong while placing the order.",
+        variant: "destructive",
+      });
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -136,8 +155,8 @@ const Checkout = () => {
           <AnimatedSection animation="fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <Link 
-                  to="/catalog" 
+                <Link
+                  to="/catalog"
                   className="inline-flex items-center space-x-2 text-primary hover:text-primary-hover mb-4"
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -166,7 +185,7 @@ const Checkout = () => {
                     <User className="h-6 w-6 text-primary" />
                     <h2 className="text-xl font-semibold text-foreground">Personal Information</h2>
                   </div>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
@@ -181,7 +200,7 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Last Name *
@@ -195,7 +214,7 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Email Address *
@@ -209,7 +228,7 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Phone Number *
@@ -223,7 +242,7 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Company Name (Optional)
@@ -236,7 +255,7 @@ const Checkout = () => {
                         className="w-full px-4 py-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-foreground mb-2">
                         GST Number (Optional)
@@ -259,7 +278,7 @@ const Checkout = () => {
                     <MapPin className="h-6 w-6 text-primary" />
                     <h2 className="text-xl font-semibold text-foreground">Shipping Address</h2>
                   </div>
-                  
+
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
@@ -274,7 +293,7 @@ const Checkout = () => {
                         required
                       />
                     </div>
-                    
+
                     <div className="grid md:grid-cols-3 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
@@ -289,7 +308,7 @@ const Checkout = () => {
                           required
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
                           State *
@@ -312,7 +331,7 @@ const Checkout = () => {
                           {/* Add more states as needed */}
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
                           Pincode *
@@ -365,7 +384,7 @@ const Checkout = () => {
                     <ShoppingBag className="h-5 w-5" />
                     <span>Order Summary</span>
                   </h2>
-                  
+
                   <div className="space-y-4 max-h-64 overflow-y-auto">
                     {state.items.map((item) => (
                       <div key={item.id} className="flex items-center space-x-3 pb-4 border-b border-border last:border-b-0">
@@ -413,19 +432,19 @@ const Checkout = () => {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium">{formatPrice(subtotal)}</span>
                   </div>
-                  
+
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">GST (18%)</span>
                     <span className="font-medium">{formatPrice(gstAmount)}</span>
                   </div>
-                  
+
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
                     <span className="font-medium">
                       {shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}
                     </span>
                   </div>
-                  
+
                   <div className="border-t border-border pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-foreground">Total</span>

@@ -27,130 +27,57 @@ const Catalog = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Mock products data (replace with API call)
+  // Fetch products from backend
   useEffect(() => {
-    const mockProducts: Product[] = [
-      {
-        id: '1',
-        name: 'GRACO 390 PC',
-        price: 110000,
-        image: '/sprayers/390.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.8,
-        featured: true,
-        inStock: true,
-        description: 'Professional airless paint sprayer for high-volume applications',
-      },
-      {
-        id: '2',
-        name: 'Graco Spray Machine 490',
-        price: 190000,
-        image: '/sprayers/490.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.7,
-        featured: true,
-        inStock: true,
-        description: 'Premium electric random orbital sander with dust extraction',
-      },
-      {
-        id: '3',
-        name: 'FinishPro GX 19 Electric Airless Sprayer',
-        price: 85000,
-        image: '/sprayers/finishpro.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.7,
-        featured: true,
-        inStock: true,
-        description: 'High-performance industrial primer for metal surfaces',
-      },
-      {
-        id: '4',
-        name: 'Graco Ultra Max 2 490 PC Pro Stand Airless Unit',
-        price: 165000,
-        image: '/sprayers/490-ultra-max-2.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.5,
-        featured: false,
-        inStock: true,
-        description: 'High volume low pressure spray gun for precision coating',
-      },
-      {
-        id: '5',
-        name: 'Mirka Pros 625',
-        price: 30000,
-        image: '/mirka/pros625.webp',
-        category: 'Sanding Tools',
-        brand: 'Mirka',
-        rating: 4.9,
-        featured: false,
-        inStock: true,
-        description: 'Revolutionary mesh abrasive discs for superior dust extraction',
-      },
-      {
-        id: '6',
-        name: 'Asian Paints Enamel Paint',
-        price: 3200,
-        image: '/placeholder.svg',
-        category: 'Paints & Coatings',
-        brand: 'Asian Paints',
-        rating: 4.4,
-        featured: false,
-        inStock: false,
-        description: 'Premium quality enamel paint for industrial applications',
-      },
-      {
-        id: '7',
-        name: 'Graco Ultra 395 Airless Paint Sprayer',
-        price: 150000,
-        image: '/sprayers/395-ultra.webp',
-        category: 'Paint Equipment',
-        brand: 'Wagner',
-        rating: 4.3,
-        featured: false,
-        inStock: true,
-        description: 'Professional paint roller system for efficient coverage',
-      },
-      {
-        id: '8',
-        name: 'Backing Pad MF 150 mm',
-        price: 7400,
-        image: '/mirka/backingpad.webp',
-        category: 'Sanding Tools',
-        brand: 'Mirka',
-        rating: 4.8,
-        featured: false,
-        inStock: true,
-        description: 'Precision orbital sander with excellent dust extraction',
-      },
-    ];
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/products");
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
 
-    setTimeout(() => {
-      setProducts(mockProducts);
-      setFilteredProducts(mockProducts);
-      setLoading(false);
-    }, 1000);
+        // Transform to match frontend expectations - FIX: properly map in_stock field
+        const productsFromDB: Product[] = data.map((p: any) => ({
+          id: p.id.toString(),
+          name: p.name,
+          price: p.price,
+          image: p.image || "/placeholder.svg",
+          category: p.category || "General",
+          brand: p.brand || "Unknown",
+          rating: p.rating || 4.5,
+          featured: Boolean(p.featured),
+          inStock: Boolean(p.in_stock), // FIX: Map in_stock correctly
+          description: p.description || "",
+        }));
+
+        setProducts(productsFromDB);
+        setFilteredProducts(productsFromDB);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   // Get unique categories
-  const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
+  const categories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
 
-  // Filter and sort products
+  // Filter + Sort
   useEffect(() => {
     let filtered = products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+      const matchesCategory =
+        selectedCategory === 'All' || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
 
-    // Sort products
+    // Sorting
     filtered.sort((a, b) => {
-      let aValue, bValue;
-
+      let aValue: any, bValue: any;
       switch (sortBy) {
         case 'price':
           aValue = a.price;
@@ -166,12 +93,7 @@ const Catalog = () => {
           bValue = b.name.toLowerCase();
           break;
       }
-
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
+      return sortOrder === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
     });
 
     setFilteredProducts(filtered);
@@ -179,6 +101,13 @@ const Catalog = () => {
 
   const handleSortToggle = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(price);
   };
 
   return (
@@ -200,7 +129,7 @@ const Catalog = () => {
         </div>
       </section>
 
-      {/* Filters and Search */}
+      {/* Filters/Search */}
       <section className="sticky top-[73px] bg-background/95 backdrop-blur-sm border-b border-border z-40">
         <div className="container-max py-6">
           <AnimatedSection animation="fade-in">
@@ -249,10 +178,11 @@ const Catalog = () => {
                     onClick={handleSortToggle}
                     className="p-2 hover:bg-muted rounded-lg transition-colors"
                   >
-                    {sortOrder === 'asc' ?
-                      <SortAsc className="h-5 w-5" /> :
+                    {sortOrder === 'asc' ? (
+                      <SortAsc className="h-5 w-5" />
+                    ) : (
                       <SortDesc className="h-5 w-5" />
-                    }
+                    )}
                   </button>
                 </div>
 
@@ -260,19 +190,21 @@ const Catalog = () => {
                 <div className="flex items-center border border-input rounded-lg">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 transition-colors ${viewMode === 'grid'
+                    className={`p-2 transition-colors ${
+                      viewMode === 'grid'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                      }`}
+                    }`}
                   >
                     <Grid className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 transition-colors ${viewMode === 'list'
+                    className={`p-2 transition-colors ${
+                      viewMode === 'list'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                      }`}
+                    }`}
                   >
                     <List className="h-5 w-5" />
                   </button>
@@ -347,7 +279,7 @@ const Catalog = () => {
                       ) : (
                         <div className="card-elevated p-6 flex items-center space-x-6">
                           <img
-                            src={product.image}
+                            src={`http://localhost:5000${product.image}`}
                             alt={product.name}
                             className="w-24 h-24 object-cover rounded-lg bg-muted flex-shrink-0"
                           />
@@ -360,17 +292,23 @@ const Catalog = () => {
                                 <p className="text-sm text-muted-foreground mb-2">
                                   {product.brand} • {product.category}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-muted-foreground line-clamp-2">
                                   {product.description}
                                 </p>
                               </div>
-                              <div className="text-right ml-4">
+                              <div className="text-right ml-4 flex-shrink-0">
                                 <p className="text-xl font-bold text-primary mb-2">
-                                  ₹{product.price.toLocaleString()}
+                                  {formatPrice(product.price)}
                                 </p>
-                                <button className="btn-primary text-sm px-4 py-2">
-                                  View Details
-                                </button>
+                                {product.inStock ? (
+                                  <button className="btn-primary text-sm px-4 py-2">
+                                    Add to Cart
+                                  </button>
+                                ) : (
+                                  <button disabled className="bg-gray-100 text-gray-400 px-4 py-2 rounded text-sm">
+                                    Out of Stock
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>

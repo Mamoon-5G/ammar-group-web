@@ -9,49 +9,41 @@ const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock featured products (replace with API call)
   useEffect(() => {
-    // Simulate API call
-    const mockProducts = [
-      {
-        id: '1',
-        name: 'GRACO 390 PC',
-        price: 110000,
-        image: '/sprayers/390.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.8,
-        featured: true,
-        inStock: true,
-      },
-      {
-        id: '2',
-        name: 'Graco Spray Machine 490',
-        price: 190000,
-        image: '/sprayers/490.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.7,
-        featured: true,
-        inStock: true,
-      },
-      {
-        id: '3',
-        name: 'FinishPro GX 19 Electric Airless Sprayer',
-        price: 85000,
-        image: '/sprayers/finishpro.webp',
-        category: 'Paint Equipment',
-        brand: 'Graco',
-        rating: 4.7,
-        featured: true,
-        inStock: true,
-      },
-    ];
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:5000/api/products");
+        if (!res.ok) throw new Error("Failed to fetch products");
 
-    setTimeout(() => {
-      setFeaturedProducts(mockProducts);
-      setLoading(false);
-    }, 1000);
+        const data = await res.json();
+
+        // Transform data to match ProductCard props - FIX: properly map all fields
+        const transformedProducts = data.map((p: any) => ({
+          id: p.id.toString(),
+          name: p.name,
+          price: p.price,
+          image: p.image || "/uploads/placeholder.svg",
+          category: p.category || "General",
+          brand: p.brand || "Unknown",
+          rating: p.rating || 4.5,
+          featured: Boolean(p.featured),
+          inStock: Boolean(p.in_stock), // FIX: Map in_stock correctly
+          description: p.description || "",
+        }));
+
+        // Filter featured products first, then fallback to first 3
+        const featured = transformedProducts.filter((p: any) => p.featured);
+        setFeaturedProducts(featured.length > 0 ? featured.slice(0, 3) : transformedProducts.slice(0, 3));
+        
+      } catch (err) {
+        console.error("Error fetching featured products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
   }, []);
 
   const trustIndicators = [

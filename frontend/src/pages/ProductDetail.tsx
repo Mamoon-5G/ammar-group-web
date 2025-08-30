@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Star, 
-  ShoppingCart, 
+import {
+  ArrowLeft,
+  Star,
+  ShoppingCart,
   CreditCard,
   Shield,
   Truck,
@@ -27,9 +27,9 @@ interface ProductDetail {
   brand: string;
   rating: number;
   description: string;
-  longDescription: string;
-  specifications: Record<string, string>;
-  features: string[];
+  longDescription?: string; // optional
+  specifications?: Record<string, string>; // optional
+  features?: string[]; // optional
   inStock: boolean;
   stockCount: number;
   sku: string;
@@ -45,56 +45,34 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Mock product data (replace with API call)
+  // ✅ Fetch product from backend
   useEffect(() => {
-    const mockProduct: ProductDetail = {
-      id: id || '1',
-      name: 'Graco Airless Paint Sprayer Pro 210ES',
-      price: 85000,
-      images: [
-        '/placeholder.svg',
-        '/placeholder.svg',
-        '/placeholder.svg',
-        '/placeholder.svg',
-      ],
-      category: 'Paint Equipment',
-      brand: 'Graco',
-      rating: 4.8,
-      description: 'Professional airless paint sprayer for high-volume applications with superior finish quality.',
-      longDescription: `The Graco Pro 210ES is a professional-grade airless paint sprayer designed for contractors and serious DIYers who demand consistent, high-quality results. This versatile sprayer handles a wide range of materials from latex paints to stains and primers, delivering a professional finish every time.
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch product");
+        const data = await res.json();
 
-Built with Graco's proven piston pump technology, the Pro 210ES provides reliable performance with minimal maintenance. The unit features an adjustable pressure control that allows you to fine-tune the spray pattern for different materials and applications.
-
-Perfect for interior and exterior projects, this sprayer can handle up to 125 gallons per year, making it ideal for medium to large-scale projects. The compact design and lightweight construction ensure easy portability without compromising on power.`,
-      specifications: {
-        'Maximum Pressure': '3000 PSI',
-        'Maximum Flow Rate': '0.34 GPM',
-        'Maximum Tip Size': '0.015"',
-        'Motor': '5/8 HP',
-        'Weight': '35 lbs',
-        'Hose Length': '25 ft',
-        'Warranty': '2 Years',
-        'Power': '115V, 60Hz',
-      },
-      features: [
-        'ProXChange Piston Pump for easy maintenance',
-        'PowerFlush Adapter for fast cleanup',
-        'Stainless steel piston and cylinder',
-        'Professional gun with swivel connector',
-        'Adjustable pressure control',
-        'Compact and portable design',
-        'Handles latex, enamels, and stains',
-        'Easy-to-read pressure gauge',
-      ],
-      inStock: true,
-      stockCount: 15,
-      sku: 'GRC-210ES-PRO',
+        setProduct({
+          ...data,
+          images: data.images && data.images.length > 0
+            ? data.images
+            : ["/uploads/placeholder.svg"],
+          features: Array.isArray(data.features) ? data.features : [],
+          specifications: data.specifications && typeof data.specifications === "object"
+            ? data.specifications
+            : {},
+          longDescription: data.longDescription || "", // fallback empty string
+        });
+      } catch (err) {
+        console.error(err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setTimeout(() => {
-      setProduct(mockProduct);
-      setLoading(false);
-    }, 1000);
+    if (id) fetchProduct();
   }, [id]);
 
   const handleAddToCart = () => {
@@ -121,7 +99,7 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
 
   const handleBuyNow = () => {
     handleAddToCart();
-    // Navigate to checkout would be handled here
+    // 👉 navigate("/checkout") if you want auto-redirect
   };
 
   const formatPrice = (price: number) => {
@@ -167,9 +145,8 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
             <span>/</span>
             <span className="text-foreground">{product.name}</span>
           </div>
-          
-          <Link 
-            to="/catalog" 
+          <Link
+            to="/catalog"
             className="inline-flex items-center space-x-2 text-primary hover:text-primary-hover mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -187,26 +164,25 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
               {/* Main Image */}
               <div className="aspect-square rounded-xl overflow-hidden bg-muted">
                 <img
-                  src={product.images[selectedImage]}
+                  src={`http://localhost:5000${product.images[selectedImage]}`}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               {/* Thumbnail Gallery */}
               <div className="grid grid-cols-4 gap-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden bg-muted border-2 transition-colors ${
-                      selectedImage === index 
-                        ? 'border-primary' 
+                    className={`aspect-square rounded-lg overflow-hidden bg-muted border-2 transition-colors ${selectedImage === index
+                        ? 'border-primary'
                         : 'border-transparent hover:border-muted-foreground'
-                    }`}
+                      }`}
                   >
                     <img
-                      src={image}
+                      src={`http://localhost:5000${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -239,11 +215,10 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-5 w-5 ${
-                          i < Math.floor(product.rating)
+                        className={`h-5 w-5 ${i < Math.floor(product.rating)
                             ? 'text-accent fill-current'
                             : 'text-muted-foreground'
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -270,22 +245,29 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
 
               {/* Quantity & Actions */}
               <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <label className="font-medium">Quantity:</label>
-                  <div className="flex items-center border border-input rounded-lg">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-2 hover:bg-muted transition-colors"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="px-4 py-2 font-medium">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(Math.min(product.stockCount, quantity + 1))}
-                      className="p-2 hover:bg-muted transition-colors"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <label className="font-medium">Quantity:</label>
+                    <div className="flex items-center border border-input rounded-lg">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="p-2 hover:bg-muted transition-colors"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <button
+                        onClick={() => {
+                          // Fix the NaN issue by providing fallback values
+                          const maxQuantity = product?.stockCount || product?.stockCount || 999; // fallback to 999 if no stock info
+                          const currentQuantity = quantity || 1; // fallback to 1 if quantity is NaN
+                          setQuantity(Math.min(maxQuantity, currentQuantity + 1));
+                        }}
+                        className="p-2 hover:bg-muted transition-colors"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -299,7 +281,7 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
                     <ShoppingCart className="h-5 w-5" />
                     <span>Add to Cart</span>
                   </motion.button>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -309,16 +291,17 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
                     <CreditCard className="h-5 w-5" />
                     <span>Buy Now</span>
                   </motion.button>
-                  
+
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`p-3 border border-input rounded-lg transition-colors ${
-                      isWishlisted 
-                        ? 'bg-destructive text-destructive-foreground' 
+                    className={`p-3 border border-input rounded-lg transition-colors ${isWishlisted
+                        ? 'bg-destructive text-destructive-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
-                    <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                    <Heart
+                      className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`}
+                    />
                   </button>
                 </div>
               </div>
@@ -352,11 +335,13 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-foreground">Description</h2>
               <div className="prose prose-gray max-w-none">
-                {product.longDescription.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="text-muted-foreground leading-relaxed mb-4">
-                    {paragraph}
-                  </p>
-                ))}
+                {product.longDescription
+                  ? product.longDescription.split('\n\n').map((p, i) => (
+                    <p key={i} className="text-muted-foreground leading-relaxed mb-4">
+                      {p}
+                    </p>
+                  ))
+                  : <p className="text-muted-foreground">No extra details available.</p>}
               </div>
             </div>
           </AnimatedSection>
@@ -384,12 +369,16 @@ Perfect for interior and exterior projects, this sprayer can handle up to 125 ga
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-foreground">Key Features</h2>
             <div className="grid md:grid-cols-2 gap-4">
-              {product.features.map((feature, index) => (
-                <div key={index} className="flex items-start space-x-3 p-4 card-elevated">
-                  <Check className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">{feature}</span>
-                </div>
-              ))}
+              {product.features.length > 0 ? (
+                product.features.map((feature, index) => (
+                  <div key={index} className="flex items-start space-x-3 p-4 card-elevated">
+                    <Check className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">{feature}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground">No key features listed.</p>
+              )}
             </div>
           </div>
         </AnimatedSection>
