@@ -2,15 +2,27 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock, ArrowRight } from 'lucide-react';
 import logo from '../assets/logo.png';
-
+import gracoLogo from '../assets/graco-logo.png';
+import mirkaLogo from '../assets/mirka-logo.png';
+import bergerLogo from '../assets/bergerlogo.webp';
+import starLogo from '../assets/star-logo.png';
+import protectonLogo from '../assets/protecton-logo.png';
+import redwopLogo from '../assets/redwop-logo.png';
+import kwickFixLogo from '../assets/kwick-fix-logo.png';
+import pciLogo from '../assets/pci-logo.png';
+import weberLogo from '../assets/weber-logo.svg';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const partnerBrands = [
-    { name: 'Graco', logo: '/placeholder.svg' },
-    { name: 'Mirka', logo: '/placeholder.svg' },
-    { name: 'Berger', logo: '/placeholder.svg' },
-    { name: 'Asian Paints', logo: '/placeholder.svg' },
+    { name: 'Graco', logo: gracoLogo },
+    { name: 'Mirka', logo: mirkaLogo },
+    { name: 'Berger', logo: bergerLogo },
+    { name: 'Star', logo: starLogo },
+    { name: 'Protecton', logo: protectonLogo },
+    { name: 'Redwop', logo: redwopLogo },
+    { name: 'Kwick Fix', logo: kwickFixLogo },
+    { name: 'Weber', logo: weberLogo },
   ];
 
   const quickLinks = [
@@ -40,15 +52,17 @@ const Footer = () => {
             Trusted by industry leaders worldwide
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 items-center justify-items-center">
           {partnerBrands.map((brand) => (
             <div
               key={brand.name}
               className="card-elevated p-6 hover:scale-105 transition-transform duration-300 bg-background w-full flex items-center justify-center min-h-[80px]"
             >
-              <span className="text-lg font-bold text-muted-foreground">
-                {brand.name}
-              </span>
+              <img
+                src={brand.logo}
+                alt={brand.name}
+                className="max-h-12 max-w-full object-contain"
+              />
             </div>
           ))}
         </div>
@@ -64,8 +78,8 @@ const Footer = () => {
                 <img src={logo} alt="Ammar Group" className="h-12 w-auto" />
               </Link>
               <p className="text-muted-foreground leading-relaxed">
-                Leading provider of industrial equipment and solutions since 1995. 
-                We specialize in high-quality tools, paints, and technical services 
+                Leading provider of industrial equipment and solutions since 1995.
+                We specialize in high-quality tools, paints, and technical services
                 for manufacturing and construction industries.
               </p>
               <div className="space-y-3">
@@ -136,7 +150,7 @@ const Footer = () => {
                   Browse Products
                 </Link>
               </div>
-              
+
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h5 className="font-medium text-foreground mb-2">Business Hours</h5>
                 <div className="space-y-1 text-sm text-muted-foreground">

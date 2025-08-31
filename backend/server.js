@@ -18,8 +18,8 @@ const app = express();
 
 // ✅ CORS + JSON middleware FIRST
 app.use(cors({
-  origin: "http://localhost:5173", // frontend (Vite)
-  methods: ["GET", "POST"],
+  origin: "*", // frontend (Vite)
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
 app.use(express.json());
@@ -33,7 +33,7 @@ app.use("/images", express.static(path.join(process.cwd(), "public/images")));
 app.use("/api/order", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/admin", admin)
-app.use("/api/users",users)
+app.use("/api/users", users)
 // ✅ DB connection (non-promise API)
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
