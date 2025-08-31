@@ -8,6 +8,7 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
+  const API = process.env.REACT_APP_API_URL;
   const [isLogin, setIsLogin] = useState(true);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", {
+      const res = await axios.post(`${API}/api/users/login`, {
         email,
         password,
       });
@@ -49,13 +50,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post(`${API}/api/order`, {
         fullName,
         email,
         password,
       });
       // after signup, auto-login
-      const res = await axios.post("http://localhost:5000/api/users/login", {
+      const res = await axios.post(`${API}/api/order`, {
         email,
         password,
       });

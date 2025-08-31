@@ -18,6 +18,7 @@ interface Product {
 }
 
 const Catalog = () => {
+  const API = process.env.REACT_APP_API_URL;
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ const Catalog = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${API}/api/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
 
@@ -279,7 +280,7 @@ const Catalog = () => {
                       ) : (
                         <div className="card-elevated p-6 flex items-center space-x-6">
                           <img
-                            src={`http://localhost:5000${product.image}`}
+                            src={`${API}${product.image}`}
                             alt={product.name}
                             className="w-24 h-24 object-cover rounded-lg bg-muted flex-shrink-0"
                           />

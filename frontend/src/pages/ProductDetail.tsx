@@ -36,6 +36,7 @@ interface ProductDetail {
 }
 
 const ProductDetail = () => {
+  const API = process.env.REACT_APP_API_URL;
   const { id } = useParams<{ id: string }>();
   const { addItem, openCart } = useCart();
   const { toast } = useToast();
@@ -164,7 +165,7 @@ const ProductDetail = () => {
               {/* Main Image */}
               <div className="aspect-square rounded-xl overflow-hidden bg-muted">
                 <img
-                  src={`http://localhost:5000${product.images[selectedImage]}`}
+                  src={`${API}${product.images[selectedImage]}`}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
@@ -182,7 +183,7 @@ const ProductDetail = () => {
                       }`}
                   >
                     <img
-                      src={`http://localhost:5000${image}`}
+                      src={`${API}${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />

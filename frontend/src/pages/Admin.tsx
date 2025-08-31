@@ -26,6 +26,7 @@ interface Product {
 }
 
 const Admin: React.FC = () => {
+  const API = process.env.REACT_APP_API_URL;
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -62,7 +63,7 @@ const Admin: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/login", {
+      const res = await axios.post(`${API}/api/admin/login`, {
         username,
         password,
       });
@@ -175,8 +176,8 @@ const Admin: React.FC = () => {
       }
 
       const url = editProduct
-        ? `http://localhost:5000/api/products/${editProduct.id}`
-        : "http://localhost:5000/api/products";
+        ? `${API}/api/products/${editProduct.id}`
+        : `${API}/api/products`;
       const method = editProduct ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -227,7 +228,7 @@ const Admin: React.FC = () => {
     if (!id) return;
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`${API}/api/products/${id}`);
       fetchProducts();
     } catch (err) {
       console.error("Failed to delete product", err);
