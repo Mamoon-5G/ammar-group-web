@@ -18,7 +18,7 @@ const app = express();
 
 // ✅ CORS + JSON middleware FIRST
 app.use(cors({
-  origin: "*", // frontend (Vite)
+  origin: "https://ammar-group-web.vercel.app/", // frontend (Vite)
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
