@@ -4,13 +4,12 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Import your route files
-import orderRoutes from "./routes/order.js";
-import productRoutes from "./routes/products.js";
-import adminRoutes from "./routes/admin.js";
-import userRoutes from "./routes/users.js";
+// Temporarily comment out all route imports
+// import orderRoutes from "./routes/order.js";
+// import productRoutes from "./routes/products.js";
+// import adminRoutes from "./routes/admin.js";
+// import userRoutes from "./routes/users.js";
 
-// Boilerplate for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,18 +27,17 @@ app.use(express.json());
 
 // --- Static File Serving ---
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/images", express.static(path.join(__dirname, "public/images"))); // Adjusted for consistency
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
-app.use("/images", express.static(path.join(process.cwd(), "public/images")));
-// --- API Routes ---
-app.use("/api/order", orderRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/users", userRoutes);
 
-// ❌ The database connection logic is now in db.js
-// ❌ The duplicate app.get('/api/products') route has been removed
+// --- API Routes (Temporarily Disabled) ---
+// app.use("/api/order", orderRoutes);
+// app.use("/api/products", productRoutes);
+// app.use("/api/admin", adminRoutes);
+// app.use("/api/users", userRoutes);
+
+// Add a simple, guaranteed-to-work route for testing
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server is stable and running on port ${PORT}`));
