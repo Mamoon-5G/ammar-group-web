@@ -6,7 +6,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import ProductCard from '../components/ProductCard';
 
 const Home = () => {
-  const API = process.env.REACT_APP_API_URL;
+  const API = import.meta.env.VITE_API_URL;
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 

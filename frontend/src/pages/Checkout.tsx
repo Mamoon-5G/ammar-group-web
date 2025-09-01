@@ -89,7 +89,7 @@ const Checkout = () => {
     setIsProcessing(true);
 
     try {
-      const API = process.env.REACT_APP_API_URL;
+      const API = import.meta.env.VITE_API_URL;
       const response = await fetch(`${API}/api/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

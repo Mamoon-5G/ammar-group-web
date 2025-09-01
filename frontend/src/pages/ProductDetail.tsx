@@ -36,7 +36,7 @@ interface ProductDetail {
 }
 
 const ProductDetail = () => {
-  const API = process.env.REACT_APP_API_URL;
+  const API = import.meta.env.VITE_API_URL;
   const { id } = useParams<{ id: string }>();
   const { addItem, openCart } = useCart();
   const { toast } = useToast();
