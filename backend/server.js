@@ -16,15 +16,15 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS + JSON middleware FIRST
+
 app.use(cors({
-  origin: "*", // frontend (Vite)
+  origin: "*", 
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
 app.use(express.json());
 
-// ✅ Static files
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
 app.use("/images", express.static(path.join(process.cwd(), "public/images")));
