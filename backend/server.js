@@ -18,9 +18,9 @@ const app = express();
 
 
 app.use(cors({
-  origin: "*", // frontend (Vite)
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  credentials: true
+  origin: ["http://localhost:5173", "https://ammar-group-web.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
