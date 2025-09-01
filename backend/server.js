@@ -18,7 +18,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: "*", 
+  origin: "*", // frontend (Vite)
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
