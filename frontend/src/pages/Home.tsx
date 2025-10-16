@@ -36,7 +36,7 @@ const Home = () => {
         // Filter featured products first, then fallback to first 3
         const featured = transformedProducts.filter((p: any) => p.featured);
         setFeaturedProducts(featured.length > 0 ? featured.slice(0, 3) : transformedProducts.slice(0, 3));
-        
+
       } catch (err) {
         console.error("Error fetching featured products:", err);
       } finally {
@@ -101,17 +101,17 @@ const Home = () => {
                   <Star className="h-4 w-4 text-accent" />
                   <span>Trusted by 10,000+ Clients Since 1995</span>
                 </motion.div>
-                
+
                 <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                   Industrial Excellence
                   <span className="block text-accent">Delivered</span>
                 </h1>
-                
+
                 <p className="text-xl text-primary-foreground/90 leading-relaxed max-w-lg">
-                  Premium industrial equipment, paints, and technical solutions from 
+                  Premium industrial equipment, paints, and technical solutions from
                   world-class brands. Empowering your projects with precision and reliability.
                 </p>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link to="/catalog" className="btn-accent inline-flex items-center space-x-2">
                     <span>Browse Products</span>
@@ -123,7 +123,7 @@ const Home = () => {
                 </div>
               </div>
             </AnimatedSection>
-            
+
             <AnimatedSection animation="slide-left" delay={0.3}>
               <div className="relative">
                 <motion.div
@@ -140,7 +140,7 @@ const Home = () => {
                         Your trusted partner in industrial solutions
                       </p>
                     </div>
-                    
+
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <div className="text-3xl font-bold text-accent">25+</div>
@@ -174,7 +174,7 @@ const Home = () => {
               Built on trust, driven by excellence, and committed to your success
             </p>
           </AnimatedSection>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {trustIndicators.map((item, index) => (
               <AnimatedSection
@@ -203,6 +203,83 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="section-padding bg-background">
+        <div className="container-max">
+          <AnimatedSection animation="fade-up" className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+              Our Valued Clients
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Proudly serving India’s leading industrial and infrastructure giants
+            </p>
+          </AnimatedSection>
+
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8 place-items-center">
+            {[
+              {
+                name: "Larsen & Toubro Construction Ltd",
+                logo: "/clients/lt.png",
+                url: "https://www.larsentoubro.com/",
+              },
+              {
+                name: "Godrej & Boyce Ltd",
+                logo: "/clients/godrej.png",
+                url: "https://www.godrej.com/",
+              },
+              {
+                name: "Mumbai International Airport Pvt Ltd",
+                logo: "/clients/airport.png",
+                url: "https://www.csmia.adaniairports.com/",
+              },
+              {
+                name: "Tata Projects Ltd",
+                logo: "/clients/tata.webp",
+                url: "https://www.tataprojects.com/",
+              },
+              {
+                name: "Supreme Bituchem Pvt Ltd",
+                logo: "/clients/supreme.png",
+                url: "https://www.supremebituchem.com/",
+              },
+              {
+                name: "Normet India Pvt Ltd",
+                logo: "/clients/normet.png",
+                url: "https://www.normet.com/",
+              },
+              {
+                name: "Jollyboard Pvt Ltd",
+                logo: "/clients/jollyboard.png",
+                url: "https://www.jollyboard.com/",
+              },
+            ].map((client, index) => (
+              <AnimatedSection
+                key={client.name}
+                animation="fade-up"
+                delay={index * 0.1}
+              >
+                <motion.a
+                  href={client.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  className="card-elevated p-6 flex flex-col items-center justify-center h-full cursor-pointer transition-all duration-300 hover:shadow-medium"
+                >
+                  <img
+                    src={client.logo}
+                    alt={client.name}
+                    className="h-20 w-auto object-contain mb-4"
+                    loading="lazy"
+                  />
+                  <h3 className="text-sm font-medium text-foreground text-center">
+                    {client.name}
+                  </h3>
+                </motion.a>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Products */}
       <section className="section-padding">
         <div className="container-max">
@@ -214,7 +291,7 @@ const Home = () => {
               Discover our top-selling industrial equipment and solutions
             </p>
           </AnimatedSection>
-          
+
           {loading ? (
             <div className="grid md:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
@@ -241,7 +318,7 @@ const Home = () => {
               ))}
             </div>
           )}
-          
+
           <AnimatedSection animation="fade-up" delay={0.8} className="text-center mt-12">
             <Link to="/catalog" className="btn-primary inline-flex items-center space-x-2">
               <span>View All Products</span>
@@ -262,7 +339,7 @@ const Home = () => {
               Beyond products, we provide complete solutions for your success
             </p>
           </AnimatedSection>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <AnimatedSection
@@ -287,7 +364,7 @@ const Home = () => {
               </AnimatedSection>
             ))}
           </div>
-          
+
           <AnimatedSection animation="fade-up" delay={0.8} className="text-center mt-12">
             <Link to="/services" className="btn-outline">
               Learn More About Our Services
@@ -304,7 +381,7 @@ const Home = () => {
               Ready to Get Started?
             </h2>
             <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-              Join thousands of satisfied customers who trust Ammar Group for their 
+              Join thousands of satisfied customers who trust Ammar Group for their
               industrial equipment needs. Get expert advice and premium products today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
