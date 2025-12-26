@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { CartProvider } from "./contexts/CartContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import CartSidebar from "./components/CartSidebar";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import ProductDetail from "./pages/ProductDetail";
@@ -15,28 +15,21 @@ import Services from "./pages/Services";
 import About from "./pages/About";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
-import AuthModal from "./components/AuthModal";
-import { AuthProvider } from "./contexts/AuthContext";
 import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [showAuth, setShowAuth] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
           <CartProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
               <div className="min-h-screen flex flex-col">
-                {/* Navbar with login trigger */}
-                <Navbar onLoginClick={() => setShowAuth(true)} />
+                <Navbar />
 
                 <main className="flex-1">
                   <Routes>
@@ -52,26 +45,13 @@ const App = () => {
                 </main>
 
                 <Footer />
-                <CartSidebar
-                  onRequireLogin={() => setShowAuth(true)} // block cart for guests
-                />
+                <CartSidebar />
               </div>
-
-              {/* Auth Modal */}
-              {showAuth && (
-                <AuthModal
-                  onClose={() => setShowAuth(false)}
-                  onLoginSuccess={() => {
-                    setIsLoggedIn(true);
-                    setShowAuth(false);
-                  }}
-                />
-              )}
             </BrowserRouter>
           </CartProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

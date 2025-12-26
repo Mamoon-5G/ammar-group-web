@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ShoppingCart, Phone, Mail } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import logo from '../assets/logo.png';
 
-const Navbar = ({ onLoginClick }) => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const location = useLocation();
   const { getTotalItems, toggleCart } = useCart();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(null);
-  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -83,26 +69,6 @@ const Navbar = ({ onLoginClick }) => {
                   />
                 </Link>
               ))}
-
-              {/* Auth Buttons */}
-              {user ? (
-                <div className="flex items-center space-x-4">
-                  <span className="font-medium">Hello, {user.fullName}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={onLoginClick}
-                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition"
-                >
-                  Login / Signup
-                </button>
-              )}
             </div>
 
             {/* Cart & Mobile Menu */}
@@ -160,34 +126,6 @@ const Navbar = ({ onLoginClick }) => {
                     {item.name}
                   </Link>
                 ))}
-
-                {/* Mobile Auth Buttons */}
-                {user ? (
-                  <div className="space-y-3">
-                    <span className="block font-medium text-center">
-                      Hello, {user.fullName}
-                    </span>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsOpen(false);
-                      }}
-                      className="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      onLoginClick();
-                    }}
-                    className="w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition"
-                  >
-                    Login / Signup
-                  </button>
-                )}
 
                 {/* Mobile Contact Info */}
                 <div className="pt-4 border-t border-border space-y-2">

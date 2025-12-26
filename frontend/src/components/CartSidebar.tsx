@@ -3,13 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'
-interface CartSidebarProps {
-  onRequireLogin: () => void;
-}
 
-const CartSidebar: React.FC<CartSidebarProps> = ({ onRequireLogin }) => {
-
+const CartSidebar: React.FC = () => {
   const {
     state,
     closeCart,
@@ -26,14 +21,23 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onRequireLogin }) => {
       currency: 'INR'
     }).format(price);
   };
-  const {isLoggedIn} = useAuth();
-  
-  const handlleCheckout = () => {
-    if (!isLoggedIn) {
-      onRequireLogin();
-      return;
+
+  const API = import.meta.env.VITE_API_URL;
+
+  // Handle image URL - ensure it includes the API base URL if it's a relative path
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '/placeholder.svg';
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
+      return `${API}${imagePath}`;
     }
-  }
+    return imagePath;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = '/placeholder.svg';
+  };
 
   return (
     <AnimatePresence>
@@ -115,9 +119,11 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onRequireLogin }) => {
                     >
                       <div className="flex space-x-4">
                         <img
-                          src={item.image}
+                          src={getImageUrl(item.image)}
                           alt={item.name}
+                          onError={handleImageError}
                           className="w-16 h-16 object-cover rounded-lg bg-muted"
+                          loading="lazy"
                         />
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate">
@@ -182,7 +188,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onRequireLogin }) => {
                 {/* Checkout Button */}
                 <Link
                   to="/checkout"
-                  onClick={handlleCheckout}
+                  onClick={closeCart}
                   className="w-full btn-primary text-center block"
                 >
                   Proceed to Checkout

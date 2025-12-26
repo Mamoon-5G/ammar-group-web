@@ -86,7 +86,7 @@ const Admin: React.FC = () => {
   const fetchProducts = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:5000/api/products", {
+      const res = await axios.get(`${API}/api/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(res.data);

@@ -27,9 +27,9 @@ interface ProductDetail {
   brand: string;
   rating: number;
   description: string;
-  longDescription?: string; // optional
-  specifications?: Record<string, string>; // optional
-  features?: string[]; // optional
+  longDescription?: string;
+  specifications?: Record<string, string>;
+  features?: string[];
   inStock: boolean;
   stockCount: number;
   sku: string;
@@ -50,20 +50,30 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/products/${id}`);
+        const res = await fetch(`${API}/api/products/${id}`);
         if (!res.ok) throw new Error("Failed to fetch product");
         const data = await res.json();
 
         setProduct({
           ...data,
+          id: data.id?.toString() || '0',
+          name: data.name || 'Unknown Product',
+          price: Number(data.price) || 0,
           images: data.images && data.images.length > 0
             ? data.images
             : ["/uploads/placeholder.svg"],
+          category: data.category || 'General',
+          brand: data.brand || 'Unknown',
+          rating: Number(data.rating) || 4.5,
+          description: data.description || 'No description available',
           features: Array.isArray(data.features) ? data.features : [],
           specifications: data.specifications && typeof data.specifications === "object"
             ? data.specifications
             : {},
-          longDescription: data.longDescription || "", // fallback empty string
+          longDescription: data.long_description || data.longDescription || "",
+          inStock: Boolean(data.in_stock),
+          stockCount: Number(data.stock_count) || 0,
+          sku: data.sku || 'N/A',
         });
       } catch (err) {
         console.error(err);
@@ -74,33 +84,59 @@ const ProductDetail = () => {
     };
 
     if (id) fetchProduct();
-  }, [id]);
+  }, [id, API]);
 
   const handleAddToCart = () => {
     if (!product) return;
 
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.images[0],
-        category: product.category,
-        brand: product.brand,
+    try {
+      const validQuantity = Math.max(1, Number(quantity) || 1);
+
+      for (let i = 0; i < validQuantity; i++) {
+        addItem({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0] || '/placeholder.svg',
+          category: product.category,
+          brand: product.brand,
+        });
+      }
+
+      toast({
+        title: "Added to Cart",
+        description: `${validQuantity} x ${product.name} added to your cart.`,
+      });
+
+      openCart();
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
       });
     }
-
-    toast({
-      title: "Added to Cart",
-      description: `${quantity} x ${product.name} added to your cart.`,
-    });
-
-    openCart();
   };
 
   const handleBuyNow = () => {
     handleAddToCart();
     // 👉 navigate("/checkout") if you want auto-redirect
+  };
+
+  // Handle image URL - ensure it includes the API base URL if it's a relative path
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '/placeholder.svg';
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
+      return `${API}${imagePath}`;
+    }
+    return imagePath;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = '/placeholder.svg';
   };
 
   const formatPrice = (price: number) => {
@@ -165,9 +201,11 @@ const ProductDetail = () => {
               {/* Main Image */}
               <div className="aspect-square rounded-xl overflow-hidden bg-muted">
                 <img
-                  src={`${API}${product.images[selectedImage]}`}
+                  src={getImageUrl(product.images[selectedImage])}
                   alt={product.name}
+                  onError={handleImageError}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
 
@@ -178,14 +216,16 @@ const ProductDetail = () => {
                     key={index}
                     onClick={() => setSelectedImage(index)}
                     className={`aspect-square rounded-lg overflow-hidden bg-muted border-2 transition-colors ${selectedImage === index
-                        ? 'border-primary'
-                        : 'border-transparent hover:border-muted-foreground'
+                      ? 'border-primary'
+                      : 'border-transparent hover:border-muted-foreground'
                       }`}
                   >
                     <img
-                      src={`${API}${image}`}
+                      src={getImageUrl(image)}
                       alt={`${product.name} ${index + 1}`}
+                      onError={handleImageError}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </button>
                 ))}
@@ -198,12 +238,16 @@ const ProductDetail = () => {
             <div className="space-y-6">
               {/* Brand & Category */}
               <div className="flex items-center space-x-4">
-                <span className="bg-primary-light text-primary px-3 py-1 rounded-full text-sm font-medium">
-                  {product.brand}
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {product.category}
-                </span>
+                {product.brand && (
+                  <span className="bg-primary-light text-primary px-3 py-1 rounded-full text-sm font-medium">
+                    {product.brand}
+                  </span>
+                )}
+                {product.category && (
+                  <span className="text-muted-foreground text-sm">
+                    {product.category}
+                  </span>
+                )}
               </div>
 
               {/* Title & Rating */}
@@ -216,15 +260,15 @@ const ProductDetail = () => {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-5 w-5 ${i < Math.floor(product.rating)
-                            ? 'text-accent fill-current'
-                            : 'text-muted-foreground'
+                        className={`h-5 w-5 ${i < Math.floor(product.rating || 0)
+                          ? 'text-accent fill-current'
+                          : 'text-muted-foreground'
                           }`}
                       />
                     ))}
                   </div>
                   <span className="text-muted-foreground">
-                    ({product.rating}) • SKU: {product.sku}
+                    ({product.rating || 0}) • SKU: {product.sku || 'N/A'}
                   </span>
                 </div>
               </div>
@@ -235,7 +279,7 @@ const ProductDetail = () => {
                   {formatPrice(product.price)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  + GST & Shipping • {product.stockCount} in stock
+                  + GST & Shipping • {product.stockCount || 0} in stock
                 </p>
               </div>
 
@@ -251,20 +295,21 @@ const ProductDetail = () => {
                     <label className="font-medium">Quantity:</label>
                     <div className="flex items-center border border-input rounded-lg">
                       <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        onClick={() => setQuantity(Math.max(1, Number(quantity) - 1))}
                         className="p-2 hover:bg-muted transition-colors"
+                        disabled={quantity <= 1}
                       >
                         <Minus className="h-4 w-4" />
                       </button>
                       <span className="px-4 py-2 font-medium">{quantity}</span>
                       <button
                         onClick={() => {
-                          // Fix the NaN issue by providing fallback values
-                          const maxQuantity = product?.stockCount || product?.stockCount || 999; // fallback to 999 if no stock info
-                          const currentQuantity = quantity || 1; // fallback to 1 if quantity is NaN
+                          const maxQuantity = product?.stockCount || 999;
+                          const currentQuantity = Number(quantity) || 1;
                           setQuantity(Math.min(maxQuantity, currentQuantity + 1));
                         }}
                         className="p-2 hover:bg-muted transition-colors"
+                        disabled={quantity >= (product?.stockCount || 999)}
                       >
                         <Plus className="h-4 w-4" />
                       </button>
@@ -296,8 +341,8 @@ const ProductDetail = () => {
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={`p-3 border border-input rounded-lg transition-colors ${isWishlisted
-                        ? 'bg-destructive text-destructive-foreground'
-                        : 'hover:bg-muted'
+                      ? 'bg-destructive text-destructive-foreground'
+                      : 'hover:bg-muted'
                       }`}
                   >
                     <Heart
@@ -336,13 +381,13 @@ const ProductDetail = () => {
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-foreground">Description</h2>
               <div className="prose prose-gray max-w-none">
-                {product.longDescription
+                {product.longDescription && product.longDescription.trim()
                   ? product.longDescription.split('\n\n').map((p, i) => (
                     <p key={i} className="text-muted-foreground leading-relaxed mb-4">
                       {p}
                     </p>
                   ))
-                  : <p className="text-muted-foreground">No extra details available.</p>}
+                  : <p className="text-muted-foreground">No additional details available.</p>}
               </div>
             </div>
           </AnimatedSection>
@@ -353,12 +398,18 @@ const ProductDetail = () => {
               <h2 className="text-2xl font-bold text-foreground">Specifications</h2>
               <div className="card-elevated">
                 <div className="divide-y divide-border">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="px-6 py-4 flex justify-between">
-                      <span className="font-medium text-foreground">{key}</span>
-                      <span className="text-muted-foreground">{value}</span>
+                  {product.specifications && Object.keys(product.specifications).length > 0 ? (
+                    Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="px-6 py-4 flex justify-between">
+                        <span className="font-medium text-foreground">{key}</span>
+                        <span className="text-muted-foreground">{value}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-6 py-4 text-center text-muted-foreground">
+                      No specifications available
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
@@ -370,7 +421,7 @@ const ProductDetail = () => {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-foreground">Key Features</h2>
             <div className="grid md:grid-cols-2 gap-4">
-              {product.features.length > 0 ? (
+              {product.features && product.features.length > 0 ? (
                 product.features.map((feature, index) => (
                   <div key={index} className="flex items-start space-x-3 p-4 card-elevated">
                     <Check className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
@@ -378,7 +429,9 @@ const ProductDetail = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-muted-foreground">No key features listed.</p>
+                <div className="col-span-full text-center text-muted-foreground p-8">
+                  No key features listed.
+                </div>
               )}
             </div>
           </div>

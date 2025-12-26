@@ -24,7 +24,7 @@ const Home = () => {
           id: p.id.toString(),
           name: p.name,
           price: p.price,
-          image: p.image || "/uploads/placeholder.svg",
+          image: p.image || "/placeholder.svg",
           category: p.category || "General",
           brand: p.brand || "Unknown",
           rating: p.rating || 4.5,

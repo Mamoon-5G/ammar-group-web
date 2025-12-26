@@ -30,6 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   hideCart = false,
 }) => {
   const { addItem, openCart } = useCart();
+  const API = import.meta.env.VITE_API_URL;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,6 +53,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }).format(price);
   };
 
+  // Handle image URL - ensure it includes the API base URL if it's a relative path
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '/placeholder.svg';
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
+      return `${API}${imagePath}`;
+    }
+    return imagePath;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = '/placeholder.svg';
+  };
+
   return (
     <Link to={`/catalog/${id}`} className="block">
       <motion.div
@@ -69,12 +85,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
+        {/* Stock Status Badge */}
+        {!inStock && (
+          <div className="absolute top-3 right-3 z-20">
+            <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+              Out of Stock
+            </div>
+          </div>
+        )}
+
         {/* Image Container */}
         <div className="relative aspect-square bg-gray-100 overflow-hidden">
           <img
-            src={image}
+            src={getImageUrl(image)}
             alt={name}
+            onError={handleImageError}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
           />
           
           {/* Gradient Overlay on Hover */}

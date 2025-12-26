@@ -280,9 +280,14 @@ const Catalog = () => {
                       ) : (
                         <div className="card-elevated p-6 flex items-center space-x-6">
                           <img
-                            src={`${API}${product.image}`}
+                            src={product.image.startsWith('http') ? product.image : `${API}${product.image}`}
                             alt={product.name}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = '/placeholder.svg';
+                            }}
                             className="w-24 h-24 object-cover rounded-lg bg-muted flex-shrink-0"
+                            loading="lazy"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between">

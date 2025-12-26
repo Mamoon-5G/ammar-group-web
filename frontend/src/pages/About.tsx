@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Award, 
-  Users, 
-  Globe, 
+import {
+  Award,
+  Users,
+  Globe,
   Target,
   Heart,
   Shield,
@@ -17,37 +17,41 @@ import { Link } from 'react-router-dom';
 const About = () => {
   const milestones = [
     {
-      year: '1995',
-      title: 'Foundation',
-      description: 'Ammar Group established with a vision to provide quality industrial solutions.',
+      year: '1976',
+      title: 'The Beginning',
+      description: 'Ammar Group was born with a vision to revolutionize manufacturing solutions in India.',
     },
     {
-      year: '2000',
-      title: 'First Partnership',
-      description: 'Became authorized dealer for Graco, marking our entry into premium equipment.',
+      year: '1995',
+      title: 'Paint Distribution',
+      description: 'Ventured into premium paint distribution, bringing world-class coating solutions to Indian industries.',
     },
     {
       year: '2005',
-      title: 'Expansion',
-      description: 'Expanded operations across North India with multiple distribution centers.',
+      title: 'Construction Chemicals',
+      description: 'Expanded horizons from paints to comprehensive construction chemical solutions, building stronger foundations.',
     },
     {
-      year: '2010',
-      title: 'Diversification',
-      description: 'Added paint and coating solutions to our comprehensive product portfolio.',
+      year: '2007',
+      title: 'Graco Partnership',
+      description: 'Became authorized distributor for Graco, introducing cutting-edge fluid handling technology to our portfolio.',
+    },
+    {
+      year: '2012-13',
+      title: 'Adhesives Division',
+      description: 'Forged strategic partnership with Atul for industrial adhesives, bonding success with innovation.',
     },
     {
       year: '2015',
-      title: 'Digital Transformation',
-      description: 'Launched online platform and digital customer service solutions.',
+      title: 'Digital Revolution',
+      description: 'Embraced digitalization to enhance customer experience and streamline operations nationwide.',
     },
     {
-      year: '2020',
-      title: 'Pan-India Presence',
-      description: 'Achieved nationwide coverage with 10,000+ satisfied customers.',
+      year: '2023',
+      title: 'Mirka Fine Finish',
+      description: 'Added Mirka fine finish tools to our arsenal, perfecting the art of precision finishing solutions.',
     },
   ];
-
   const values = [
     {
       icon: Shield,
@@ -115,8 +119,8 @@ const About = () => {
       partnership: 'Exclusive Distributor since 2010',
     },
     {
-      name: 'Asian Paints',
-      description: 'India\'s largest paint company',
+      name: 'Atul Limited',
+      description: 'Atul is an improvement driven, integrated chemical company serving about 4,000 customers belonging to 30 industries across the world. ',
       partnership: 'Strategic Partner since 2012',
     },
   ];
@@ -132,13 +136,13 @@ const About = () => {
               <span className="block text-accent">Ammar Group</span>
             </h1>
             <p className="text-xl text-primary-foreground/90 max-w-3xl mx-auto mb-8">
-              Building industrial excellence since 1995. We are your trusted partner 
-              in providing world-class equipment, solutions, and support for manufacturing, 
+              Building industrial excellence since 1995. We are your trusted partner
+              in providing world-class equipment, solutions, and support for manufacturing,
               construction, and industrial applications.
             </p>
             <div className="flex items-center justify-center space-x-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-accent">25+</div>
+                <div className="text-3xl font-bold text-accent">50+</div>
                 <div className="text-sm opacity-90">Years</div>
               </div>
               <div className="text-center">
@@ -165,20 +169,20 @@ const About = () => {
                     Our Mission
                   </h2>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    To empower industries with premium equipment, innovative solutions, 
-                    and expert support that drive efficiency, quality, and growth. We are 
-                    committed to being the most trusted partner for industrial success 
+                    To empower industries with premium equipment, innovative solutions,
+                    and expert support that drive efficiency, quality, and growth. We are
+                    committed to being the most trusted partner for industrial success
                     across India.
                   </p>
                 </div>
-                
+
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">
                     Our Vision
                   </h3>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    To be India's leading provider of industrial solutions, known for 
-                    excellence, innovation, and customer success. We envision a future 
+                    To be India's leading provider of industrial solutions, known for
+                    excellence, innovation, and customer success. We envision a future
                     where every business has access to world-class equipment and support.
                   </p>
                 </div>
@@ -221,7 +225,7 @@ const About = () => {
               Our Journey
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From humble beginnings to industry leadership - explore the milestones 
+              From humble beginnings to industry leadership - explore the milestones
               that shaped Ammar Group's success story
             </p>
           </AnimatedSection>
@@ -251,12 +255,12 @@ const About = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     {/* Timeline Dot */}
                     <div className="relative">
                       <div className="w-4 h-4 bg-primary rounded-full border-4 border-background shadow-soft" />
                     </div>
-                    
+
                     <div className="flex-1" />
                   </div>
                 </AnimatedSection>
@@ -317,7 +321,7 @@ const About = () => {
               Trusted Partnerships
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We are proud to represent world-class brands that share our commitment 
+              We are proud to represent world-class brands that share our commitment
               to quality, innovation, and customer success
             </p>
           </AnimatedSection>
@@ -363,8 +367,8 @@ const About = () => {
                 Join Our Success Story
               </h2>
               <p className="text-xl text-primary-foreground/90">
-                Become part of the Ammar Group family and experience the difference 
-                that 25 years of excellence can make for your business.
+                Become part of the Ammar Group family and experience the difference
+                that 50 years of excellence can make for your business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/catalog" className="btn-accent">
