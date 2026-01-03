@@ -124,12 +124,12 @@ const ProductDetail = () => {
     // 👉 navigate("/checkout") if you want auto-redirect
   };
 
-  // Handle image URL - ensure it includes the API base URL if it's a relative path
+  // Handle image URL - Cloudinary URLs are complete, local URLs need API base
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return '/placeholder.svg';
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('http')) return imagePath; // Cloudinary URLs
     if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
-      return `${API}${imagePath}`;
+      return `${API}${imagePath}`; // Local URLs
     }
     return imagePath;
   };
@@ -194,7 +194,7 @@ const ProductDetail = () => {
 
       {/* Product Details */}
       <div className="container-max pb-16">
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Images */}
           <AnimatedSection animation="slide-right">
             <div className="space-y-4">
@@ -235,9 +235,9 @@ const ProductDetail = () => {
 
           {/* Product Info */}
           <AnimatedSection animation="slide-left">
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Brand & Category */}
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                 {product.brand && (
                   <span className="bg-primary-light text-primary px-3 py-1 rounded-full text-sm font-medium">
                     {product.brand}

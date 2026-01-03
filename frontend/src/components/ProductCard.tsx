@@ -53,12 +53,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }).format(price);
   };
 
-  // Handle image URL - ensure it includes the API base URL if it's a relative path
+  // Handle image URL - Cloudinary URLs are complete, local URLs need API base
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return '/placeholder.svg';
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('http')) return imagePath; // Cloudinary URLs
     if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
-      return `${API}${imagePath}`;
+      return `${API}${imagePath}`; // Local URLs
     }
     return imagePath;
   };
@@ -77,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       >
         {/* Featured Badge - Improved positioning with z-index */}
         {featured && (
-          <div className="absolute top-3 left-3 z-20">
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-20">
             <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
               <Award className="h-3 w-3" />
               <span className="text-xs font-medium">Featured</span>
@@ -87,7 +87,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Stock Status Badge */}
         {!inStock && (
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-20">
             <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
               Out of Stock
             </div>
@@ -107,9 +107,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Gradient Overlay on Hover */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
           
-          {/* Overlay Actions - Only show if cart is not hidden */}
+          {/* Overlay Actions - Only show if cart is not hidden and on larger screens */}
           {!hideCart && (
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex">
               <div className="flex items-center gap-2">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -134,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-3">
+        <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
           {/* Brand & Category */}
           <div className="flex items-center justify-between">
             {brand && (
@@ -150,7 +150,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Product Name */}
-          <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors text-sm sm:text-base">
             {name}
           </h3>
 
@@ -174,7 +174,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Price & Action */}
           <div className="flex items-center justify-between pt-2">
             <div>
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-base sm:text-lg font-bold text-gray-900">
                 {formatPrice(price)}
               </p>
               <p className="text-xs text-gray-500">Incl. of taxes</p>
@@ -185,7 +185,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <button
                   onClick={handleAddToCart}
                   disabled={!inStock}
-                  className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                  className={`px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium rounded-lg transition-colors ${
                     inStock
                       ? 'bg-primary text-white hover:bg-primary/90'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'

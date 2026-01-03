@@ -36,19 +36,38 @@ const Catalog = () => {
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
 
-        // Transform to match frontend expectations - FIX: properly map in_stock field
-        const productsFromDB: Product[] = data.map((p: any) => ({
-          id: p.id.toString(),
-          name: p.name,
-          price: p.price,
-          image: p.image || "/placeholder.svg",
-          category: p.category || "General",
-          brand: p.brand || "Unknown",
-          rating: p.rating || 4.5,
-          featured: Boolean(p.featured),
-          inStock: Boolean(p.in_stock), // FIX: Map in_stock correctly
-          description: p.description || "",
-        }));
+        console.log("📦 Raw API Response:", data);
+
+        // Transform to match frontend expectations
+        const productsFromDB: Product[] = data.map((p: any) => {
+          // Use images array first, then fall back to image field, then placeholder
+          let imageUrl = '/placeholder.svg';
+          
+          if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+            imageUrl = p.images[0]; // Use first image from array
+            console.log(`✅ Using image array for ${p.name}: ${imageUrl}`);
+          } else if (p.image) {
+            imageUrl = p.image; // Fallback to image field
+            console.log(`⚠️ Using single image field for ${p.name}: ${imageUrl}`);
+          } else {
+            console.log(`❌ No image found for ${p.name}`);
+          }
+
+          return {
+            id: p.id.toString(),
+            name: p.name,
+            price: p.price,
+            image: imageUrl,
+            category: p.category || "General",
+            brand: p.brand || "Unknown",
+            rating: p.rating || 4.5,
+            featured: Boolean(p.featured),
+            inStock: Boolean(p.in_stock),
+            description: p.description || "",
+          };
+        });
+
+        console.log("🎨 Transformed products:", productsFromDB);
 
         setProducts(productsFromDB);
         setFilteredProducts(productsFromDB);
@@ -132,29 +151,30 @@ const Catalog = () => {
 
       {/* Filters/Search */}
       <section className="sticky top-[73px] bg-background/95 backdrop-blur-sm border-b border-border z-40">
-        <div className="container-max py-6">
+        <div className="container-max py-4 sm:py-6">
           <AnimatedSection animation="fade-in">
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col gap-4">
               {/* Search */}
-              <div className="relative flex-1 max-w-md">
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search products, brands..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-base"
                 />
               </div>
 
-              <div className="flex items-center gap-4">
+              {/* Filters Row */}
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                 {/* Category Filter */}
-                <div className="flex items-center space-x-2">
-                  <Filter className="h-5 w-5 text-muted-foreground" />
+                <div className="flex items-center space-x-2 min-w-0">
+                  <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="border border-input rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="border border-input rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary focus:border-transparent text-sm min-w-0"
                   >
                     {categories.map(category => (
                       <option key={category} value={category}>
@@ -165,11 +185,11 @@ const Catalog = () => {
                 </div>
 
                 {/* Sort */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 min-w-0">
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="border border-input rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="border border-input rounded-lg px-3 py-2 bg-background focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   >
                     <option value="name">Name</option>
                     <option value="price">Price</option>
@@ -180,15 +200,15 @@ const Catalog = () => {
                     className="p-2 hover:bg-muted rounded-lg transition-colors"
                   >
                     {sortOrder === 'asc' ? (
-                      <SortAsc className="h-5 w-5" />
+                      <SortAsc className="h-4 w-4" />
                     ) : (
-                      <SortDesc className="h-5 w-5" />
+                      <SortDesc className="h-4 w-4" />
                     )}
                   </button>
                 </div>
 
                 {/* View Toggle */}
-                <div className="flex items-center border border-input rounded-lg">
+                <div className="flex items-center border border-input rounded-lg ml-auto">
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-2 transition-colors ${
@@ -197,7 +217,7 @@ const Catalog = () => {
                         : 'hover:bg-muted'
                     }`}
                   >
-                    <Grid className="h-5 w-5" />
+                    <Grid className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
@@ -207,15 +227,15 @@ const Catalog = () => {
                         : 'hover:bg-muted'
                     }`}
                   >
-                    <List className="h-5 w-5" />
+                    <List className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Results Count */}
-            <div className="mt-4 text-sm text-muted-foreground">
-              {loading ? 'Loading...' : `${filteredProducts.length} products found`}
+              {/* Results Count */}
+              <div className="text-sm text-muted-foreground">
+                {loading ? 'Loading...' : `${filteredProducts.length} products found`}
+              </div>
             </div>
           </AnimatedSection>
         </div>

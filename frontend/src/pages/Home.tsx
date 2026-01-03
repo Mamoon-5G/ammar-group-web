@@ -19,19 +19,31 @@ const Home = () => {
 
         const data = await res.json();
 
-        // Transform data to match ProductCard props - FIX: properly map all fields
-        const transformedProducts = data.map((p: any) => ({
-          id: p.id.toString(),
-          name: p.name,
-          price: p.price,
-          image: p.image || "/placeholder.svg",
-          category: p.category || "General",
-          brand: p.brand || "Unknown",
-          rating: p.rating || 4.5,
-          featured: Boolean(p.featured),
-          inStock: Boolean(p.in_stock), // FIX: Map in_stock correctly
-          description: p.description || "",
-        }));
+        console.log("📦 Home page API response:", data);
+
+        // Transform data to match ProductCard props - use images array
+        const transformedProducts = data.map((p: any) => {
+          let imageUrl = '/placeholder.svg';
+          
+          if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+            imageUrl = p.images[0]; // Use first image from array
+          } else if (p.image) {
+            imageUrl = p.image; // Fallback to image field
+          }
+
+          return {
+            id: p.id.toString(),
+            name: p.name,
+            price: p.price,
+            image: imageUrl,
+            category: p.category || "General",
+            brand: p.brand || "Unknown",
+            rating: p.rating || 4.5,
+            featured: Boolean(p.featured),
+            inStock: Boolean(p.in_stock),
+            description: p.description || "",
+          };
+        });
 
         // Filter featured products first, then fallback to first 3
         const featured = transformedProducts.filter((p: any) => p.featured);

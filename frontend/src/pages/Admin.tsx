@@ -15,7 +15,7 @@ interface Product {
   category?: string;
   description?: string;
   long_description?: string;
-  specifications?: string[];
+  specifications?: Record<string, string>; // Changed from string[] to Record<string, string>
   features?: string[];
   price?: number;
   stock_count?: number;
@@ -34,7 +34,7 @@ const Admin: React.FC = () => {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   // Interactive fields
-  const [specs, setSpecs] = useState<string[]>([]);
+  const [specs, setSpecs] = useState<Record<string, string>>({});
   const [features, setFeatures] = useState<string[]>([]);
   const [formData, setFormData] = useState<Product>({
     name: "",
@@ -45,7 +45,7 @@ const Admin: React.FC = () => {
     category: "",
     description: "",
     long_description: "",
-    specifications: [],
+    specifications: {},
     features: [],
     stock_count: undefined,
     rating: 4.5,
@@ -59,6 +59,49 @@ const Admin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("adminToken") || "");
 
+  // Auto-logout timer (10 minutes)
+  useEffect(() => {
+    let logoutTimer: NodeJS.Timeout;
+    
+    if (token) {
+      // Set timer for 10 minutes (600,000 ms)
+      logoutTimer = setTimeout(() => {
+        handleLogout();
+        alert("Session expired. Please login again.");
+      }, 10 * 60 * 1000);
+    }
+
+    return () => {
+      if (logoutTimer) {
+        clearTimeout(logoutTimer);
+      }
+    };
+  }, [token]);
+
+  // Reset timer on user activity
+  useEffect(() => {
+    const resetTimer = () => {
+      // This will trigger the useEffect above to reset the timer
+      if (token) {
+        setToken(token);
+      }
+    };
+
+    if (token) {
+      // Add event listeners for user activity
+      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+      events.forEach(event => {
+        document.addEventListener(event, resetTimer, true);
+      });
+
+      return () => {
+        events.forEach(event => {
+          document.removeEventListener(event, resetTimer, true);
+        });
+      };
+    }
+  }, [token]);
+
   // Handle login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +112,6 @@ const Admin: React.FC = () => {
       });
       localStorage.setItem("adminToken", res.data.token);
       setToken(res.data.token);
-      console.log({username, password})
     } catch (err: any) {
       alert(err.response?.data?.error || "Login failed");
     }
@@ -155,8 +197,8 @@ const Admin: React.FC = () => {
         }
       });
 
-      // Handle specifications - send as array, backend will convert to string
-      if (specs.length > 0) {
+      // Handle specifications - send as object, backend will convert to string
+      if (Object.keys(specs).length > 0) {
         data.append("specifications", JSON.stringify(specs));
       }
 
@@ -211,14 +253,14 @@ const Admin: React.FC = () => {
       category: "",
       description: "",
       long_description: "",
-      specifications: [],
+      specifications: {},
       features: [],
       stock_count: undefined,
       rating: 4.5,
       featured: 0,
       images: [],
     });
-    setSpecs([]);
+    setSpecs({});
     setFeatures([]);
     setImageFiles([]);
   };
@@ -246,7 +288,7 @@ const Admin: React.FC = () => {
   const openEditModal = (product: Product) => {
     setEditProduct(product);
     setFormData(product);
-    setSpecs(Array.isArray(product.specifications) ? product.specifications : []);
+    setSpecs(product.specifications && typeof product.specifications === "object" ? product.specifications : {});
     setFeatures(Array.isArray(product.features) ? product.features : []);
     setImageFiles([]);
     setModalOpen(true);
@@ -254,16 +296,16 @@ const Admin: React.FC = () => {
 
   if (!token) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-        <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-sm">
-          <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <div className="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-sm">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Admin Login</h2>
           <form onSubmit={handleLogin} className="flex flex-col space-y-4">
             <input
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="border p-2 rounded w-full"
+              className="border p-3 rounded-lg w-full text-base"
               required
             />
             <div className="relative">
@@ -272,20 +314,20 @@ const Admin: React.FC = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="border p-2 rounded w-full"
+                className="border p-3 rounded-lg w-full text-base pr-12"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2 text-gray-500"
+                className="absolute right-3 top-3 text-gray-500"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition text-base font-medium"
             >
               Login
             </button>
@@ -299,41 +341,45 @@ const Admin: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
-      <div className="bg-white shadow-sm border-b px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-        <div className="flex items-center gap-4">
-          <Link
-            to="/"
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            Back to Home
-          </Link>
-          <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Add Product
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </button>
+      <div className="bg-white shadow-sm border-b px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Panel</h1>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <Link
+              to="/"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Home</span>
+            </Link>
+            <button
+              onClick={openAddModal}
+              className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Add Product</span>
+              <span className="sm:hidden">Add</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Product Grid */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {products.map((product) => (
               <motion.div
                 key={product.id}
@@ -344,22 +390,30 @@ const Admin: React.FC = () => {
                 <div className="aspect-square bg-gray-100 flex items-center justify-center">
                   {product.images && product.images.length > 0 ? (
                     <img
-                      src={product.images[0]}
+                      src={product.images[0].startsWith('http') ? product.images[0] : `${API}${product.images[0]}`}
                       alt={product.name}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder.svg';
+                      }}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
-                    <ImageIcon className="h-12 w-12 text-gray-400" />
+                    <div className="flex flex-col items-center justify-center text-gray-400">
+                      <ImageIcon className="h-12 w-12 mb-2" />
+                      <span className="text-xs">No Image</span>
+                    </div>
                   )}
                 </div>
 
-                <div className="p-4 space-y-2">
-                  <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
-                  <p className="text-sm text-gray-500">{product.brand}</p>
+                <div className="p-3 sm:p-4 space-y-2">
+                  <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">{product.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500">{product.brand}</p>
                   {product.price !== undefined && (
-                    <p className="font-bold text-primary">₹{product.price}</p>
+                    <p className="font-bold text-primary text-sm sm:text-base">₹{product.price}</p>
                   )}
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                       }`}>
                       {product.in_stock ? "In Stock" : "Out of Stock"}
@@ -373,15 +427,15 @@ const Admin: React.FC = () => {
                   <div className="flex gap-2 pt-2">
                     <button
                       onClick={() => openEditModal(product)}
-                      className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+                      className="flex-1 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-4 w-4 mx-auto" />
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-colors"
+                      className="flex-1 p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-colors"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 mx-auto" />
                     </button>
                   </div>
                 </div>
@@ -534,29 +588,50 @@ const Admin: React.FC = () => {
                   Specifications
                 </label>
                 <div className="space-y-2">
-                  {specs.map((spec, idx) => (
-                    <div key={idx} className="flex gap-2">
+                  {Object.entries(specs).map(([key, value], idx) => (
+                    <div key={idx} className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
-                        value={spec}
+                        value={key}
                         onChange={(e) => {
-                          const newSpecs = [...specs];
-                          newSpecs[idx] = e.target.value;
+                          const newSpecs = { ...specs };
+                          delete newSpecs[key]; // Remove old key
+                          newSpecs[e.target.value] = value; // Add with new key
                           setSpecs(newSpecs);
                         }}
-                        placeholder="e.g., Weight: 2.5kg"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors"
+                        placeholder="e.g., Weight"
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors"
                       />
-                      <button
-                        onClick={() => setSpecs(specs.filter((_, i) => i !== idx))}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={value}
+                          onChange={(e) => {
+                            const newSpecs = { ...specs };
+                            newSpecs[key] = e.target.value;
+                            setSpecs(newSpecs);
+                          }}
+                          placeholder="e.g., 2.5kg"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors"
+                        />
+                        <button
+                          onClick={() => {
+                            const newSpecs = { ...specs };
+                            delete newSpecs[key];
+                            setSpecs(newSpecs);
+                          }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                   <button
-                    onClick={() => setSpecs([...specs, ""])}
+                    onClick={() => {
+                      const newKey = `Spec ${Object.keys(specs).length + 1}`;
+                      setSpecs({ ...specs, [newKey]: "" });
+                    }}
                     className="px-4 py-2 text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
                   >
                     + Add Specification
