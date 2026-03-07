@@ -58,16 +58,17 @@ const Admin: React.FC = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("adminToken") || "");
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
 
-  // Auto-logout timer (10 minutes)
+  // Auto-logout timer (10 minutes of inactivity)
   useEffect(() => {
     let logoutTimer: NodeJS.Timeout;
-    
+
     if (token) {
-      // Set timer for 10 minutes (600,000 ms)
+      // Set timer for 10 minutes (600,000 ms) from last activity
       logoutTimer = setTimeout(() => {
         handleLogout();
-        alert("Session expired. Please login again.");
+        alert("Session expired due to inactivity. Please login again.");
       }, 10 * 60 * 1000);
     }
 
@@ -76,14 +77,13 @@ const Admin: React.FC = () => {
         clearTimeout(logoutTimer);
       }
     };
-  }, [token]);
+  }, [token, lastActivity]);
 
   // Reset timer on user activity
   useEffect(() => {
-    const resetTimer = () => {
-      // This will trigger the useEffect above to reset the timer
+    const handleActivity = () => {
       if (token) {
-        setToken(token);
+        setLastActivity(Date.now());
       }
     };
 
@@ -91,12 +91,12 @@ const Admin: React.FC = () => {
       // Add event listeners for user activity
       const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
       events.forEach(event => {
-        document.addEventListener(event, resetTimer, true);
+        document.addEventListener(event, handleActivity, true);
       });
 
       return () => {
         events.forEach(event => {
-          document.removeEventListener(event, resetTimer, true);
+          document.removeEventListener(event, handleActivity, true);
         });
       };
     }

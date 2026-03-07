@@ -17,7 +17,10 @@ const Navbar = () => {
     { name: 'About', path: '/about' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <>
@@ -55,17 +58,15 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`font-medium transition-colors relative group ${
-                    isActive(item.path)
+                  className={`font-medium transition-colors relative group ${isActive(item.path)
                       ? 'text-primary'
                       : 'text-foreground hover:text-primary'
-                  }`}
+                    }`}
                 >
                   {item.name}
                   <span
-                    className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
-                      isActive(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`}
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${isActive(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`}
                   />
                 </Link>
               ))}
@@ -117,11 +118,10 @@ const Navbar = () => {
                     key={item.name}
                     to={item.path}
                     onClick={() => setIsOpen(false)}
-                    className={`block py-2 px-4 rounded-lg font-medium transition-colors ${
-                      isActive(item.path)
+                    className={`block py-2 px-4 rounded-lg font-medium transition-colors ${isActive(item.path)
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     {item.name}
                   </Link>

@@ -41,17 +41,11 @@ const Catalog = () => {
         // Transform to match frontend expectations
         const productsFromDB: Product[] = data.map((p: any) => {
           // Use images array first, then fall back to image field, then placeholder
-          let imageUrl = '/placeholder.svg';
-          
-          if (p.images && Array.isArray(p.images) && p.images.length > 0) {
-            imageUrl = p.images[0]; // Use first image from array
-            console.log(`✅ Using image array for ${p.name}: ${imageUrl}`);
-          } else if (p.image) {
-            imageUrl = p.image; // Fallback to image field
-            console.log(`⚠️ Using single image field for ${p.name}: ${imageUrl}`);
-          } else {
-            console.log(`❌ No image found for ${p.name}`);
-          }
+          let imageUrl = p.image
+            ? p.image.startsWith("http")
+              ? p.image
+              : `${API}${p.image}`
+            : `${API}/uploads/placeholder.svg`;
 
           return {
             id: p.id.toString(),
@@ -211,21 +205,19 @@ const Catalog = () => {
                 <div className="flex items-center border border-input rounded-lg ml-auto">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 transition-colors ${
-                      viewMode === 'grid'
+                    className={`p-2 transition-colors ${viewMode === 'grid'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     <Grid className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 transition-colors ${
-                      viewMode === 'list'
+                    className={`p-2 transition-colors ${viewMode === 'list'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     <List className="h-4 w-4" />
                   </button>

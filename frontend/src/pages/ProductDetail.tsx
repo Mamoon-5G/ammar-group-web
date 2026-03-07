@@ -61,7 +61,7 @@ const ProductDetail = () => {
           price: Number(data.price) || 0,
           images: data.images && data.images.length > 0
             ? data.images
-            : ["/uploads/placeholder.svg"],
+            : [`${API}/uploads/placeholder.svg`],
           category: data.category || 'General',
           brand: data.brand || 'Unknown',
           rating: Number(data.rating) || 4.5,
@@ -126,7 +126,7 @@ const ProductDetail = () => {
 
   // Handle image URL - Cloudinary URLs are complete, local URLs need API base
   const getImageUrl = (imagePath: string) => {
-    if (!imagePath) return '/placeholder.svg';
+    if (!imagePath) return `${API}/uploads/placeholder.svg`;
     if (imagePath.startsWith('http')) return imagePath; // Cloudinary URLs
     if (imagePath.startsWith('/uploads/') || imagePath.startsWith('/images/')) {
       return `${API}${imagePath}`; // Local URLs
@@ -136,7 +136,7 @@ const ProductDetail = () => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
-    target.src = '/placeholder.svg';
+    target.src = `${API}/uploads/placeholder.svg`;
   };
 
   const formatPrice = (price: number) => {
