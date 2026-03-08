@@ -206,8 +206,8 @@ const Catalog = () => {
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-2 transition-colors ${viewMode === 'grid'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
                       }`}
                   >
                     <Grid className="h-4 w-4" />
@@ -215,8 +215,8 @@ const Catalog = () => {
                   <button
                     onClick={() => setViewMode('list')}
                     className={`p-2 transition-colors ${viewMode === 'list'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
                       }`}
                   >
                     <List className="h-4 w-4" />
@@ -290,7 +290,7 @@ const Catalog = () => {
                       {viewMode === 'grid' ? (
                         <ProductCard {...product} />
                       ) : (
-                        <div className="card-elevated p-6 flex items-center space-x-6">
+                        <div className="card-elevated p-6 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                           <img
                             src={product.image.startsWith('http') ? product.image : `${API}${product.image}`}
                             alt={product.name}
@@ -298,12 +298,12 @@ const Catalog = () => {
                               const target = e.target as HTMLImageElement;
                               target.src = '/placeholder.svg';
                             }}
-                            className="w-24 h-24 object-cover rounded-lg bg-muted flex-shrink-0"
+                            className="w-full sm:w-32 h-48 sm:h-32 object-contain sm:object-cover rounded-lg bg-muted flex-shrink-0"
                             loading="lazy"
                           />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div>
+                          <div className="flex-1 w-full min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between">
+                              <div className="text-center sm:text-left">
                                 <h3 className="text-lg font-semibold text-foreground mb-1">
                                   {product.name}
                                 </h3>
@@ -314,16 +314,16 @@ const Catalog = () => {
                                   {product.description}
                                 </p>
                               </div>
-                              <div className="text-right ml-4 flex-shrink-0">
+                              <div className="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0 text-center sm:text-right">
                                 <p className="text-xl font-bold text-primary mb-2">
                                   {formatPrice(product.price)}
                                 </p>
                                 {product.inStock ? (
-                                  <button className="btn-primary text-sm px-4 py-2">
+                                  <button className="btn-primary text-sm px-4 py-2 w-full sm:w-auto">
                                     Add to Cart
                                   </button>
                                 ) : (
-                                  <button disabled className="bg-gray-100 text-gray-400 px-4 py-2 rounded text-sm">
+                                  <button disabled className="bg-gray-100 text-gray-400 px-4 py-2 rounded text-sm w-full sm:w-auto">
                                     Out of Stock
                                   </button>
                                 )}

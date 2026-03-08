@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Wrench, 
-  Users, 
-  Clock, 
-  Shield, 
-  Truck, 
+import {
+  Wrench,
+  Users,
+  Clock,
+  Shield,
+  Truck,
   BookOpen,
   Settings,
   Phone,
@@ -128,7 +128,7 @@ const Services = () => {
               <span className="block text-accent">Industrial Services</span>
             </h1>
             <p className="text-xl text-primary-foreground/90 max-w-3xl mx-auto mb-8">
-              Beyond equipment supply, we provide complete technical solutions, 
+              Beyond equipment supply, we provide complete technical solutions,
               expert consultation, and ongoing support to ensure your success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -151,7 +151,7 @@ const Services = () => {
               Our Service Portfolio
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive solutions designed to maximize your equipment performance 
+              Comprehensive solutions designed to maximize your equipment performance
               and operational efficiency
             </p>
           </AnimatedSection>
@@ -171,7 +171,7 @@ const Services = () => {
                     <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-full">
                       <service.icon className="h-8 w-8 text-primary-foreground" />
                     </div>
-                    
+
                     <div>
                       <h3 className="text-xl font-semibold text-foreground mb-3">
                         {service.title}
@@ -207,7 +207,7 @@ const Services = () => {
               Our Service Process
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              A systematic approach to ensure successful project delivery and 
+              A systematic approach to ensure successful project delivery and
               long-term customer satisfaction
             </p>
           </AnimatedSection>
@@ -251,10 +251,10 @@ const Services = () => {
                   Why Choose Our Services?
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Experience the Ammar Group advantage with our comprehensive 
+                  Experience the Ammar Group advantage with our comprehensive
                   service approach that ensures maximum value and performance.
                 </p>
-                
+
                 <ul className="space-y-4">
                   {benefits.map((benefit, index) => (
                     <motion.li
@@ -317,12 +317,12 @@ const Services = () => {
                 Ready to Get Started?
               </h2>
               <p className="text-xl text-primary-foreground/90">
-                Contact our technical experts today to discuss your requirements 
+                Contact our technical experts today to discuss your requirements
                 and discover the perfect solution for your business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="tel:+911234567890" className="btn-accent">
-                  Call Now: +91 123 456 7890
+                <a href="tel:+919082978776" className="btn-accent">
+                  Call Now: +91 90829 78776
                 </a>
                 <Link to="/catalog" className="btn-outline border-white/30 text-white hover:bg-white/10">
                   Browse Products

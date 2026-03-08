@@ -95,9 +95,20 @@ const Footer = () => {
                   <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
                   <span>10A, Pais Street, Nirmal Compund,Gala No 3, Byculla (w) Mumbai 400011</span>
                 </div>
+                <div className="mt-4 rounded-lg overflow-hidden h-40 border border-border">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.0805370355467!2d72.82851411485098!3d18.971987587146522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce71bb57fa29%3A0xcb1b5e5afb58e7ce!2sPais%20St%2C%20Byculla%20West%2C%20Jacob%20Circle%2C%20Mumbai%2C%20Maharashtra%20400011!5e0!3m2!1sen!2sin!4v1683901234567!5m2!1sen!2sin"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <Clock className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span>Mon-Sat: 9:00 AM - 6:00 PM</span>
+                  <span>Mon-Sat: 10:00 AM - 7:00 PM</span>
                 </div>
               </div>
             </div>
@@ -156,11 +167,11 @@ const Footer = () => {
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <div className="flex justify-between">
                     <span>Monday - Friday</span>
-                    <span>9:00 AM - 6:00 PM</span>
+                    <span>10:00 AM - 7:00 PM</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Saturday</span>
-                    <span>9:00 AM - 4:00 PM</span>
+                    <span>10:00 AM - 7:00 PM</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Sunday</span>
