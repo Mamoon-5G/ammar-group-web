@@ -56,7 +56,7 @@ const Footer = () => {
           {partnerBrands.map((brand) => (
             <div
               key={brand.name}
-              className="card-elevated p-6 hover:scale-105 transition-transform duration-300 bg-background w-full flex items-center justify-center min-h-[80px]"
+              className="card-elevated p-6 hover:scale-105 transition-transform duration-300 bg-background w-full flex items-center justify-center min-h-20"
             >
               <img
                 src={brand.logo}
@@ -84,20 +84,20 @@ const Footer = () => {
               </p>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 text-sm">
-                  <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                  <Phone className="h-4 w-4 text-primary shrink-0" />
                   <span>+91 90829 78776</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
-                  <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+                  <Mail className="h-4 w-4 text-primary shrink-0" />
                   <span>info@ammargroup.in</span>
                 </div>
                 <div className="flex items-start space-x-3 text-sm">
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
-                  <span>10A, Pais Street, Nirmal Compund,Gala No 3, Byculla (w) Mumbai 400011</span>
+                  <MapPin className="h-4 w-4 text-primary shrink-0 mt-1" />
+                  <span>Gala No 3 & 4, Nirmal Compound, 10 A, Pais St, opp. Taj Quarters, Byculla West, Jacob Circle, Mumbai, Maharashtra 400011</span>
                 </div>
                 <div className="mt-4 rounded-lg overflow-hidden h-40 border border-border">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.0805370355467!2d72.82851411485098!3d18.971987587146522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce71bb57fa29%3A0xcb1b5e5afb58e7ce!2sPais%20St%2C%20Byculla%20West%2C%20Jacob%20Circle%2C%20Mumbai%2C%20Maharashtra%20400011!5e0!3m2!1sen!2sin!4v1683901234567!5m2!1sen!2sin"
+                    src="https://www.google.com/maps?q=10A+Pais+Street,+Nirmal+Compound,+Gala+No+3,+Byculla+West,+Mumbai+400011&output=embed"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -107,7 +107,7 @@ const Footer = () => {
                   ></iframe>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
-                  <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                  <Clock className="h-4 w-4 text-primary shrink-0" />
                   <span>Mon-Sat: 10:00 AM - 7:00 PM</span>
                 </div>
               </div>
@@ -138,7 +138,7 @@ const Footer = () => {
                 {services.map((service) => (
                   <li key={service}>
                     <div className="text-muted-foreground flex items-center space-x-2">
-                      <ArrowRight className="h-3 w-3 text-primary flex-shrink-0" />
+                      <ArrowRight className="h-3 w-3 text-primary shrink-0" />
                       <span className="text-sm">{service}</span>
                     </div>
                   </li>

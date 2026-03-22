@@ -10,6 +10,16 @@ const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const isFeaturedFlag = (value: unknown) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return normalized === '1' || normalized === 'true' || normalized === 'on' || normalized === 'yes';
+    }
+    return false;
+  };
+
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
@@ -39,15 +49,17 @@ const Home = () => {
             category: p.category || "General",
             brand: p.brand || "Unknown",
             rating: p.rating || 4.5,
-            featured: Boolean(p.featured),
+            featured: isFeaturedFlag(p.featured),
             inStock: Boolean(p.in_stock),
             description: p.description || "",
           };
         });
 
-        // Filter featured products first, then fallback to first 3
+        // Prefer featured products, then fill remaining slots to keep 3 cards visible.
         const featured = transformedProducts.filter((p: any) => p.featured);
-        setFeaturedProducts(featured.length > 0 ? featured.slice(0, 3) : transformedProducts.slice(0, 3));
+        const nonFeatured = transformedProducts.filter((p: any) => !p.featured);
+        const visibleProducts = [...featured, ...nonFeatured].slice(0, 3);
+        setFeaturedProducts(visibleProducts);
 
       } catch (err) {
         console.error("Error fetching featured products:", err);

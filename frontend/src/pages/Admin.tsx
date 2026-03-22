@@ -25,6 +25,18 @@ interface Product {
   featured?: number;
 }
 
+const normalizeFlag = (value: unknown, defaultValue = 0): number => {
+  if (value === undefined || value === null || value === "") return defaultValue;
+  if (typeof value === "boolean") return value ? 1 : 0;
+  if (typeof value === "number") return value === 1 ? 1 : 0;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["1", "true", "on", "yes"].includes(normalized)) return 1;
+    if (["0", "false", "off", "no"].includes(normalized)) return 0;
+  }
+  return defaultValue;
+};
+
 const Admin: React.FC = () => {
   const API = import.meta.env.VITE_API_URL;
   const [products, setProducts] = useState<Product[]>([]);
@@ -287,7 +299,11 @@ const Admin: React.FC = () => {
   // Open Edit Modal
   const openEditModal = (product: Product) => {
     setEditProduct(product);
-    setFormData(product);
+    setFormData({
+      ...product,
+      in_stock: normalizeFlag(product.in_stock, 1),
+      featured: normalizeFlag(product.featured, 0),
+    });
     setSpecs(product.specifications && typeof product.specifications === "object" ? product.specifications : {});
     setFeatures(Array.isArray(product.features) ? product.features : []);
     setImageFiles([]);
